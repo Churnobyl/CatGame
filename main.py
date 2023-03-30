@@ -5,15 +5,15 @@ import re
 import time
 
 
-# 레벨업마다 전체스탯이 오르는 함수입니다. 15퍼센트씩(15.0) 오르는 것으로 임의 조정해놨습니다.. 오류.. 뜰지도 모르겠습니다... :>...
+# 레벨업마다 전체스탯이 오르는 함수입니다. 20퍼센트씩(15.0) 오르는 것으로 임의 조정해놨습니다.. 오류.. 뜰지도 모르겠습니다... :>...
 def sh_state_up(a):
-    return int(a * (1.0 + 15.0 / 100.0))
+    return int(a * 1.2)
 
-# 레벨업마다 max_exp의 값이 오르는 함수입니다.. 70퍼센트씩 오르는 것으로 임의 조정해놨습니다. 경험치 드랍량 보면서 조절해야겠슴당
+# 레벨업마다 max_exp의 값이 오르는 함수입니다.. 80퍼센트씩 오르는 것으로 임의 조정해놨습니다. 경험치 드랍량 보면서 조절해야겠슴당
 
 
 def sh_max_exp_up(a):
-    return int(a * (1.0 + 180.0 / 100.0))
+    return int(a * 1.8)
 
 
 class Object():
@@ -62,10 +62,10 @@ class Object():
 
 
 class Character(Object):
-    def __init__(self, name, level, HP, MP, attack, defense, speed, skill, eq='', exp=0) -> None:
+    def __init__(self, name, level, HP, MP, attack, defense, speed, skill, eq='', exp=0, max_exp=100) -> None:
         super().__init__(name, level, HP, MP, attack, defense, speed, skill)
         self.exp = exp
-        self.max_exp = 100
+        self.max_exp = max_exp
         self.eq = eq
 
     # 특수공격_냥검사 / 마나값 임의 / 공격값은 공격력비례 임의의 랜덤(기본 ~ +50%)값 - 몬스터의 방어력비례(30퍼) / 임의값입니다
@@ -140,20 +140,7 @@ class Character(Object):
     def status(self):
         print(f"{self.name} LV.{self.level} : EXP {self.exp}/{self.max_exp}\n   HP {self.HP}/{self.max_HP} | MP {self.MP}/{self.max_MP}")
 
-    # exp의 값이 max_exp의 값과 같거나 넘칠 때 레벨업과 레벨업 print 출력, exp값 유지하는 대신 max_exp의 값만 비례값으로 올라갑니다.
-    # 전투 종료시 경험치 드랍과 함께 매번 추가해주시는 함수와 같다고 생각해주시면 될 것 같습니다. return 선언 방식이 잘못되었다면 주석 달아주시거나 말 걸어주세요!!
-    def level_up(self, _exp):
-        self.exp = _exp
-        while True:
-            if self.exp >= self.max_exp:
-                self.level += 1
-                print(f'{self.name}가 LV.{self.level}로 레벨업했습니다!')
-                print(self.exp, self.max_exp)
-                sh_max_exp_up(self.max_exp)
-            else:
-                break
-        return
-
+    
     def level_plus1(self):
         self.max_HP = sh_state_up(self.max_HP)
         self.HP = sh_state_up(self.HP)
@@ -162,6 +149,21 @@ class Character(Object):
         self.attack = sh_state_up(self.attack)
         self.defense = sh_state_up(self.defense)
         self.speed = sh_state_up(self.speed)
+
+    # exp의 값이 max_exp의 값과 같거나 넘칠 때 레벨업과 레벨업 print 출력, exp값 유지하는 대신 max_exp의 값만 비례값으로 올라갑니다.
+    # 전투 종료시 경험치 드랍과 함께 매번 추가해주시는 함수와 같다고 생각해주시면 될 것 같습니다. return 선언 방식이 잘못되었다면 주석 달아주시거나 말 걸어주세요!!
+    def level_up(self, _exp):
+        self.exp = _exp
+        while True:
+            if self.exp >= self.max_exp:
+                self.level += 1
+                print(f'{self.name}가 LV.{self.level}로 레벨업했습니다!')
+                self.max_exp = sh_max_exp_up(self.max_exp)
+                self.level_plus1()
+            else:
+                break
+            print(self.max_HP,self.HP,self.max_MP,self.MP,self.attack,self.defense,self.speed)
+        return
 
 
 class Monster(Object):
@@ -181,7 +183,7 @@ class Boss(Object):
     def __init__(self, name, level, HP, MP, attack, defense, speed, skill) -> None:
         super().__init__(name, level, HP, MP, attack, defense, speed, skill)
 
-    # 슈뢰딩거의상_자식_5턴 / 기절 턴 수는 랜덤값,
+    # 슈뢰딩거의상_자식_5턴 / 기절 턴 수는 랜덤값(1~3턴),
     def boss_cc(self, monster):
         healing = max(self.HP+int(self.HP*0.3), self.max_HP)
         print(f"{self.name}의 {self.skill}! {self.name}의 HP를 {healing}만큼 회복했습니다.")
@@ -324,7 +326,7 @@ pet2 = Pet('pet2', '방어력을 10만큼 증가시켜줍니다.', 10, 15)
 pet3 = Pet('pet3', '방어력을 15만큼 증가시켜줍니다.', 15, 20)
 
 
-# 일반 던전 배틀 전
+# 일반배틀 준비
 def prebattle():
     battle_character = []
     for i in player_character_list:
@@ -418,6 +420,7 @@ def battle(players, monsters):
                 if action.isdigit() == False:
                     print("정수를 입력해주세요.")
                     time.sleep(2)
+                #  -- 동작 안함 --
                 elif bool(re.search(f"[1-4]", action)) == False:
                     print("잘못 입력했습니다. 다시 시도하세요.")
                     time.sleep(2)
@@ -450,14 +453,15 @@ def battle(players, monsters):
                                 print("승리!")
                                 time.sleep(2)
                                 # drop_item(earned_exp)
+                                players[0].level_up(earned_exp)
                                 players[1].level_up(earned_exp)
                                 players[2].level_up(earned_exp)
-                                players[3].level_up(earned_exp)
                                 town()
 
                     elif action == 2:
                         pass
                     elif action == 3:
+
                         pass
                     elif action == 4:
                         # 각 고양이의 속도에 따라 탈출할 확률 다름
@@ -542,7 +546,7 @@ def town():
     }
 
     while True:
-        os.system(clear)
+        # os.system(clear)
         for i in range(len(player_character_list)):
             print(
                 f"{player_character_list[i]} Lv. {player_character_list[i].level} HP: ({player_character_list[i].HP} / {player_character_list[i].max_HP}) MP: ({player_character_list[i].MP} / {player_character_list[i].max_MP})")
@@ -638,22 +642,22 @@ def buy_item():
 
             if choice_potion == '1':
                 print('참치캔을 구입하셨습니다!')
-                potion_items[0].num += 1
+                potion1.num += 1
                 player_money[0] -= 10  # potion1.price
 
             elif choice_potion == '2':
                 print('츄르를 구입하셨습니다!')
-                potion_items[1].num += 1
+                potion2.num += 1
                 player_money[0] -= 10  # potion2.price
 
             elif choice_potion == '3':
                 print('북어포을 구입하셨습니다!')
-                potion_items[2].num += 1
+                potion3.num += 1
                 player_money[0] -= 25  # potion3.price
 
             elif choice_potion == '4':
                 print('캣닢을 구입하셨습니다!')
-                potion_items[3].num += 1
+                potion4.num += 1
                 player_money[0] -= 25  # potion4.price
 
             else:
@@ -668,10 +672,10 @@ def buy_item():
 
             if choice_equipment == 'y':
                 for i in range(len(player_character_list)):
-                    if bool(player_character_list[i].ep) == False:
-                        print(
-                            f'{player_character_list[i].name}의 장비를 구매하실 수 있습니다.')
+                    if bool(player_character_list[i].eq) == False:
+                        print(f'{player_character_list[i]}', end=' ')
 
+                print(' 의 장비를 구매하실 수 있습니다.')
                 # player.attack += 10
                 # print(f"{player_character_list[].name}의 공격력이 10만큼 증가했습니다.")
 

@@ -72,14 +72,14 @@ class Character(Object):
 
     def dealing_Skill(self, monster):
         self.MP = max(self.MP - 30, 0)
-        if self.mp == 0:
+        if self.MP == 0:
             print("보유 중인 MP가 모자랍니다! 스킬을 사용할 수 없습니다!")
             return
         first_damage = random.randint(self.attack, int(self.attack * 1.5))
         damage = first_damage - int(monster.defense * 0.3)
         monster.HP = max(monster.HP - damage, 0)
         print(f"{self.name}의 {self.skill}! {monster.name}에게 {damage}의 데미지를 입혔습니다.")
-        if monster.hp == 0:
+        if monster.HP == 0:
             print(f"{monster.name}(이)가 쓰러졌습니다.")
             time.sleep(2)
             return True
@@ -96,7 +96,7 @@ class Character(Object):
         debuff = random.randint(self.defense, int(self.defense * 1.5))
         monster.defense = max(monster.defense - debuff, 0)
         print(f"{self.name}의 {self.skill}! {monster.name}의 방어력을 {debuff}만큼 깎았습니다.")
-        if monster.hp == 0:
+        if monster.HP == 0:
             print(f"{monster.name}(이)가 쓰러졌습니다.")
             time.sleep(2)
             return True
@@ -114,7 +114,7 @@ class Character(Object):
         damage = first_damage - int(monster.defense * 0.3)
         monster.HP = max(monster.HP - damage, 0)
         print(f"{self.name}의 {self.skill}! {monster.name}에게 {damage}의 데미지를 입혔습니다.")
-        if monster.hp == 0:
+        if monster.HP == 0:
             print(f"{monster.name}(이)가 쓰러졌습니다.")
             time.sleep(2)
             return True
@@ -123,14 +123,19 @@ class Character(Object):
 
     # 특수공격_냥힐러 / 마나값, 힐링값 임의로 주었습니다 / 지금 print 문이.. self.name이 시전하면서 self.name이 회복하는거라.. 이게 자힐로 들어가는 방법밖에.. 어떡할가여.. :>?
 
-    def healing_Skill(self, monster):
+    def healing_Skill(self, friend, monster):
         self.MP = max(self.MP - 50, 0)
         if self.MP == 0:
             print("보유 중인 MP가 모자랍니다! 스킬을 사용할 수 없습니다!")
             return
-        healing = max(self.HP+int(self.HP*0.3), self.max_HP)
+        heal = int(self.max_HP * 0.3)
+        if friend.max_HP >= friend.HP + heal:
+            friend.HP += heal
+        elif friend.max_HP < friend.HP + heal:
+            heal -= (friend.HP+heal - friend.max_HP)
+        healing = heal
         print(f"{self.name}의 {self.skill}! {self.name}의 HP를 {healing}만큼 회복했습니다.")
-        if monster.hp == 0:
+        if monster.HP == 0:
             print(f"{monster.name}(이)가 쓰러졌습니다.")
             time.sleep(2)
             return True
@@ -140,7 +145,6 @@ class Character(Object):
     def status(self):
         print(f"{self.name} LV.{self.level} : EXP {self.exp}/{self.max_exp}\n   HP {self.HP}/{self.max_HP} | MP {self.MP}/{self.max_MP}")
 
-    
     def level_plus1(self):
         self.max_HP = sh_state_up(self.max_HP)
         self.HP = sh_state_up(self.HP)
@@ -162,7 +166,8 @@ class Character(Object):
                 self.level_plus1()
             else:
                 break
-            print(self.max_HP,self.HP,self.max_MP,self.MP,self.attack,self.defense,self.speed)
+            print(self.max_HP, self.HP, self.max_MP, self.MP,
+                  self.attack, self.defense, self.speed)
         return
 
 
@@ -268,16 +273,22 @@ class Pet(Item):
 
     def upgrade_defense(self, other):
         other.defense += self.defense
-        print(f'귀여운 {self.name}이 {other.name}의 방어력을 {self.defense}만큼 증가시켰습니다!')
 
 
 # 장비 아이템이랑 물약 아이템이 겹치는 게 있으니 Item이라는 클래스 두고 Equipment_Item, Potion_Item가 상속하는 건 어때요
 ##
 characters = {
-    "1": Character("냥검사", 1, 1500, 30, 150, 20, 13, "냥냥펀치",),
-    "2": Character("냥법사", 1, 1200, 50, 120, 13, 10, "꾹꾹이"),
-    "3": Character("냥궁수", 1, 1000, 40, 180, 10, 18, "하악질"),
-    "4": Character("냥힐러", 1, 1400, 50, 90, 16, 14, "그루밍")
+    "1": Character("냥검사", 1, 150, 30, 15, 20, 13, "냥냥펀치",),
+    "2": Character("냥법사", 1, 120, 50, 12, 13, 10, "꾹꾹이"),
+    "3": Character("냥궁수", 1, 100, 40, 18, 10, 18, "하악질"),
+    "4": Character("냥힐러", 1, 140, 50, 9, 16, 14, "그루밍")
+}
+
+character_skills = {
+    "냥냥펀치": characters["1"].dealing_Skill,
+    "꾹꾹이": characters["2"].debuff_Skill,
+    "하악질": characters["3"].shooting_Skill,
+    "그루밍": characters["4"].healing_Skill
 }
 
 # player = Character("냥검사", 1, 150, 30, 15, 20, 13)
@@ -320,6 +331,7 @@ potion2 = Potion_Item("츄르", "MP를 20만큼 채워줍니다.", 0, 20, 0)
 potion3 = Potion_Item("북어포", "HP를 50만큼 채워줍니다.", 50, 0, 0)
 potion4 = Potion_Item("캣닢", "MP를 50만큼 채워줍니다.", 0, 50, 0)
 
+total_potions = potion1.num + potion2.num + potion3.num + potion4.num
 
 pet1 = Pet('털뭉치', '방어력을 5만큼 증가시켜줍니다.', 5, 10)
 pet2 = Pet('pet2', '방어력을 10만큼 증가시켜줍니다.', 10, 15)
@@ -404,7 +416,7 @@ def battle(players, monsters):
         if status == 'player turn':
             os.system(clear)
             for i in range(len(players)):
-                os.system(clear)
+                # os.system(clear)
                 for k in range(len(players)):
                     print(
                         f"{players[k]} Lv. {players[k].level} HP: ({players[k].HP} / {players[k].max_HP}) MP: ({players[k].MP} / {players[k].max_MP})")
@@ -458,12 +470,62 @@ def battle(players, monsters):
                                 players[2].level_up(earned_exp)
                                 town()
 
-                    elif action == 2:
-                        pass
-                    elif action == 3:
+                    elif action == '2':
+                        print("어떤 대상을 스킬공격하시겠습니까?  ", end="")
+                        print(''.join([f"{x}) {y} " for x, y in enumerate(
+                            [x for x in monsters if x.HP != 0], start=1)]))
+                        target = input()
+                        if target.isdigit() == False:
+                            print("정수를 입력해주세요.")
+                            # time.sleep(2)
+                        elif bool(re.search(f"[1-{len(monsters)}]", target)) == False:
+                            print("잘못 입력했습니다. 다시 시도하세요.")
+                            # time.sleep(2)
+                        else:
+                            target_monster = monsters[int(target) - 1]
+                            skill_find = character_skills[players[i].skill]
+                            print(players[i].skill, skill_find)
+                            check_ = skill_find(target_monster)
+                            if check_ == True:
+                                earned_exp += int(target_monster.level * 2 * random.randint(
+                                    1, 2) + target_monster.max_HP * 1.2 * random.randint(1, 2))
+                                target_monster = '기절'
+                                cache = []
+                                for i in monsters:
+                                    if i.HP != 0:
+                                        cache.append(i)
+                                monsters = cache
 
-                        pass
-                    elif action == 4:
+                            if len(monsters) == 0:
+                                print("승리!")
+                                time.sleep(2)
+                                # drop_item(earned_exp)
+                                players[0].level_up(earned_exp)
+                                players[1].level_up(earned_exp)
+                                players[2].level_up(earned_exp)
+                                town()
+
+                    elif action == '3':
+                        if total_potions > 0:
+                            while True:
+                                print('================= 현재 소모품 =================')
+                                print(
+                                    f'참치캔: {potion1.explanation}|{potion1.num}개')
+                                print(
+                                    f' 츄르 : {potion2.explanation}|{potion2.num}개')
+                                print(
+                                    f'북어포: {potion3.explanation}|{potion3.num}개')
+                                print(
+                                    f' 캣닢 : {potion4.explanation}|{potion4.num}개')
+
+                                for i in range(len(players)):
+                                    if bool(players[i].eq) == False:
+                                        print(f'{players[i]}', end=' ')
+                                        print(' 의 장비를 구매하실 수 있습니다.')
+                        else:
+                            print('현재 소유하신 소모품이 없습니다!')
+
+                    elif action == '4':
                         # 각 고양이의 속도에 따라 탈출할 확률 다름
                         if players[i].speed * (1 + random.randint(1, 10) / 10) > monster_avg_speed:
                             os.system(clear)

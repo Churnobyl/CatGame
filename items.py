@@ -69,18 +69,6 @@ class Pet(Item):
 
 # ------------------
 
-# # 장비 아이템 장착
-# equipment_items = {
-#     "1": Equipment_Item("날카로운 발톱", "공격력을 10만큼 올려줍니다.", 10),  # 냥검사 전용 장비
-#     "2": Equipment_Item("방울", "공격력을 10만큼 올려줍니다.", 10),  # 냥법사 전용 장비
-#     "3": Equipment_Item("새총", "공격력을 10만큼 올려줍니다.", 10),  # 냥궁수 전용 장비
-#     "4": Equipment_Item("장난감 막대", "공격력을 10만큼 올려줍니다.", 10)  # 냥힐러 전용 장비
-# }
-# equipment_items["1"].equip(characters["1"])  # 냥검사에 날카로운 발톱 장착
-# equipment_items["2"].equip(characters["2"])  # 냥법사에 날카로운 발톱 장착
-# equipment_items["3"].equip(characters["3"])  # 냥궁수에 날카로운 발톱 장착
-# equipment_items["4"].equip(characters["4"])  # 냥힐러에 날카로운 발톱 장착
-
 
 # 장비템 인스턴스
 equipment1 = Equipment_Item(
@@ -89,14 +77,6 @@ equipment2 = Equipment_Item("방울", "공격력을 10만큼 올려줍니다.", 
 equipment3 = Equipment_Item("새총", "공격력을 10만큼 올려줍니다.", 10)  # 냥궁수 전용 아이템
 equipment4 = Equipment_Item("장난감 막대", "공격력을 10만큼 올려줍니다.", 10)  # 냥힐러 전용 아이템
 
-
-# 물약 사용
-# potion_items = {
-#     "참치캔": Potion_Item("참치캔", "HP를 20만큼 채워줍니다.", 20, 0, 0),
-#     "츄르": Potion_Item("츄르", "MP를 20만큼 채워줍니다.", 0, 20, 0),
-#     "북어포": Potion_Item("북어포", "HP를 50만큼 채워줍니다.", 50, 0, 0),
-#     "캣닢": Potion_Item("캣", "MP를 50만큼 채워줍니다.", 0, 50, 0)
-# }
 
 # 포션 인스턴스
 potion1 = Potion_Item("참치캔", "HP를 20만큼 채워줍니다.", 20, 0, 10, 0)

@@ -16,7 +16,7 @@ def input_check(x, y, text):
 
 
 def input_check2(text):
-    if bool(re.fullmatch("[xy]", text)) is False:
+    if bool(re.fullmatch("[yn]", text)) is False:
         print("잘못 입력했습니다. 다시 시도하세요.")
         return False
     else:

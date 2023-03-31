@@ -17,34 +17,18 @@ boss_clear = 0
 # Status
 status = 'town'
 
-# Character List
-characters = {
-    "1": Character("냥검사", 1, 160, 40, 30, 25, 20, "냥냥펀치"),
-    "2": Character("냥법사", 1, 140, 50, 20, 30, 25, "하악질"),
-    "3": Character("냥궁수", 1, 120, 40, 25, 20, 30, "털뱉기"),
-    "4": Character("냥힐러", 1, 200, 60, 20, 25, 20, "그루밍")
-}
-
-# Character Skill
-character_skills = {
-    "냥냥펀치": characters["1"].dealing_Skill,
-    "하악질": characters["2"].debuff_Skill,
-    "털뱉기": characters["3"].shooting_Skill,
-    "그루밍": characters["4"].healing_Skill
-}
-
 """Story Start"""
 
 # Intro
 screen_clear()
 print("==========================")
-# time.sleep(1)
-print("====== 고양이 게임 =======")
-# time.sleep(1)
+time.sleep(1)
+print("====== 냥이 키우기 =======")
+time.sleep(1)
 print("==========================")
-# time.sleep(1)
+time.sleep(1)
 print("")
-# time.sleep(1)
+time.sleep(1)
 
 # 캐릭터 선택(3 마리)
 while len(player_character_list) < 4:
@@ -65,20 +49,20 @@ while len(player_character_list) < 4:
         if len(player_character_list) == 3:
             break
 
-# screen_clear()
+screen_clear()
 print("당신은", end=" ")
 print(*player_character_list, end="")
 print("를 선택했습니다. 이제 모험을 떠나볼까요.")
-# time.sleep(4)
+time.sleep(4)
 
 
 # Story #1. 길 걷기
-# screen_clear()
+screen_clear()
 print("여행을 떠난 당신은 길을 걷다 한 마을에 도착했습니다.")
-# time.sleep(2)
+time.sleep(2)
 
 print("마을을 한번 둘러볼까요.")
-# time.sleep(2)
+time.sleep(2)
 
 while status != 'quit':
     # 어떤 행동 끝나면 마을
@@ -107,6 +91,9 @@ while status != 'quit':
         if check_boss_clear == True:
             boss_clear += 1
             check_boss_clear = False
+
+        if boss_clear == 3:
+            status == 'victory'
 
     elif status == 'lose':
         status, player_money = lose(player_money)

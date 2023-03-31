@@ -6,18 +6,19 @@ from battlephase import *
 # store - 양예린
 
 pet_list = []
-# money > pet1.price
 
 
 def buy_item(character_list, money):
     screen_clear()
     print('    어서오세요! 냥냥상점입니다.*^^*')
     print('======================================')
+    time.sleep(1)
+    screen_clear()
 
     while True:
         print('\n구매하실 물건을 선택해주세요.')
-        choice = input('<소모품: 1> <장비: 2> < 귀여운 pet : 3>\n:')
-        if input_check(1, 3, choice) == False:
+        choice = input('<소모품: 1> <장비: 2> < 귀여운 pet : 3> < 나가기 : 4>\n:')
+        if input_check(1, 4, choice) == False:
             continue
         elif choice == '1':
             print('================메뉴판================')
@@ -34,7 +35,7 @@ def buy_item(character_list, money):
                     if money > potion1.price:
                         print('참치캔을 구입하셨습니다!')
                         potion1.num += 1
-                        money -= 10  # potion1.price
+                        money -= 10
                         break
                     else:
                         print('소지금이 모자랍니다! 다른 상품을 구매해주세요!')
@@ -44,7 +45,7 @@ def buy_item(character_list, money):
                     if money > potion2.price:
                         print('츄르를 구입하셨습니다!')
                         potion2.num += 1
-                        money -= 10  # potion2.price
+                        money -= 10
                         break
                     else:
                         print('소지금이 모자랍니다! 다른 상품을 구매해주세요!')
@@ -54,7 +55,7 @@ def buy_item(character_list, money):
                     if money > potion3.price:
                         print('북어포을 구입하셨습니다!')
                         potion3.num += 1
-                        money -= 25  # potion3.price
+                        money -= 25
                         break
                     else:
                         print('소지금이 모자랍니다! 다른 상품을 구매해주세요!')
@@ -64,12 +65,11 @@ def buy_item(character_list, money):
                     if money > potion4.price:
                         print('캣닢을 구입하셨습니다!')
                         potion4.num += 1
-                        money -= 25  # potion4.price
+                        money -= 25
                         break
                     else:
                         print('소지금이 모자랍니다! 다른 상품을 구매해주세요!')
                         break
-
                 else:
                     print('1, 2, 3, 4 중에 선택해주십시오.')
 
@@ -139,9 +139,9 @@ def buy_item(character_list, money):
             print('※안내※ pet은 종류당 한 마리만 구매하실 수 있습니다.\n')
 
             print('====================소개판====================')
-            print(' 털뭉치 : 방어력을 5만큼 증가시켜줍니다.| $100')
-            print(' 캔디볼 : 방어력을 10만큼 증가시켜줍니다| $200')
-            print('도토리볼: 방어력을 15만큼 증가시켜줍니다| $300')
+            print(' 털뭉치 : 방어력을 5만큼 증가시켜줍니다. | $100')
+            print(' 캔디볼 : 방어력을 10만큼 증가시켜줍니다.| $200')
+            print('도토리볼: 방어력을 15만큼 증가시켜줍니다.| $300')
 
             while True:
                 choice_pet = input('1) 털뭉치 | 2) 캔디볼 | 3) 도토리볼 \n:')
@@ -209,22 +209,20 @@ def buy_item(character_list, money):
                     else:
                         print('소지금이 모자랍니다! 다른 상품을 구매해주세요!')
                         break
+        elif choice == '4':
+            print("마을로 돌아갑니다!")
+            time.sleep(1)
+            return 'town', money
 
-                else:
-                    print('\n1, 2, 3 중에 선택해주십시오.')
-                    continue
-
-        else:
-            print('\n1, 2, 3 중에 선택해주세요!!')
-            continue
-
+        time.sleep(2)
+        screen_clear()
         print(f'남은 소지금은{money}원 입니다!')
 
         if money == 0:
             print('가지고 계신 소지금을 모두 사용하셨습니다!\n다음에 또 만나요~')
-            time.sleep(3)
+            time.sleep(2)
             print("마을로 돌아갑니다")
-            time.sleep(3)
+            time.sleep(2)
             town()
 
         buy_again = input('구매를 계속 진행하시겠습니까?\n y/n로 선택해주세요:')
@@ -237,9 +235,9 @@ def buy_item(character_list, money):
 
         elif buy_again == 'n':
             print('구매를 종료합니다. 저희 냥냥상점을 찾아주셔서 감사합니다!\n다음에 또 만나요~')
-            time.sleep(3)
+            time.sleep(2)
             print("마을로 돌아갑니다")
-            time.sleep(3)
+            time.sleep(2)
             return 'town', money
 
 
@@ -259,13 +257,13 @@ def town(character_list, money):
         for i in character_list:
             print(i.status())
 
-        print("-------------------------------------------------")
+        print("---------------------------------------------------")
         print(f"소지금: {money}$")
         print("- 인벤토리 -")
         print(f"{potion1.name} : {potion1.num}개")
-        print(f"{potion2.name} : {potion2.num}개")
+        print(f" {potion2.name}  : {potion2.num}개")
         print(f"{potion3.name} : {potion3.num}개")
-        print(f"{potion4.name} : {potion4.num}개")
+        print(f" {potion4.name}  : {potion4.num}개")
 
         if bool(pet_list) == True:
             print('현재 pet : ', end=" ")
@@ -321,10 +319,10 @@ def recovery_in_inn(character_list, money):
 
 def all_status_s(players):
     screen_clear()
-    print("==========================")
+    print("=========================================")
     for i in players:
         print(i.all_status())
-    print("==========================\n")
+    print("=========================================\n")
     input("계속 하시려면 아무 키나 입력해주세요!")
 
     return 'town'

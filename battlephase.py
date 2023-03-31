@@ -4,11 +4,12 @@ from items import *
 import time
 import random
 
+#                 LV  HP  MP  ATK  DEF  SPD
 bosses = [
-    Boss("슈뢰딩거", 1, 1500, 300, 150, 200, 130, "상 자식"),
-    Boss("잼민이", 1, 1200, 500, 120, 130, 100, "돌 던지기"),
-    Boss("잼순이", 1, 1000, 400, 180, 100, 180, "꼬리 당기기"),
-    Boss("제리", 1, 1400, 500, 90, 160, 140, "볼링쇼")
+    Boss("슈뢰딩거", 15, 2000, 0, 150, 100, 300, "상 자식"),
+    Boss("잼민이", 20, 1300, 0, 120, 100, 400, "돌 던지기"),
+    Boss("잼순이", 20, 1300, 0, 180, 100, 400, "꼬리 당기기"),
+    Boss("제리", 25, 2300, 0, 200, 130, 400, "볼링쇼")
 ]
 
 # 여기에 보스 스킬명 따로 필요 없나요? - 세희
@@ -68,27 +69,28 @@ def battle(players, monsters, money, character_skills):
     if boss_battle_check:
         screen_clear()
         print("탑에 들어서니 등골이 서늘하다.")
-        # time.sleep(2)
-        print(f"{players[0]}: 고요하군..")
-        # time.sleep(2)
+        time.sleep(2)
+        speaker = random.choice(players)
+        print(f"{speaker}: 고요하군..")
+        time.sleep(2)
         print(*monsters, end=" ")
         print("이(가) 등장했다!")
-        # time.sleep(2)
+        time.sleep(2)
         print("가라!", end=" ")
         print(*players, end=" ")
         print(" ")
-        # time.sleep(2)
+        time.sleep(2)
     else:
         screen_clear()
         print("길을 걷다 천적을 발견했다!")
-        # time.sleep(2)
+        time.sleep(2)
         print(*monsters, end=" ")
         print("이(가) 튀어나왔다!")
-        # time.sleep(2)
+        time.sleep(2)
         print("가라!", end=" ")
         print(*players, end=" ")
         print(" ")
-        # time.sleep(2)
+        time.sleep(2)
 
     # 턴 시작 판정
     player_avg_speed = 0
@@ -112,10 +114,11 @@ def battle(players, monsters, money, character_skills):
 
     # 턴 시작
     while True:
+        first_check = players
         if status_battle == 'player turn':
             screen_clear()
             for i in range(len(players)):
-                # screen_clear()
+                screen_clear()
                 for k in range(len(players)):
                     # 캐릭터 기본 스테이터스 창
                     print(
@@ -128,7 +131,7 @@ def battle(players, monsters, money, character_skills):
 
                 print("")
                 action = input(
-                    f"{players[i]}가 대기중입니다. 어떻게 하시겠습니까? [ 1) 일반공격 2) 스킬:{players[i].skill} 3) 포션 사용 4) 도망친다 ] : ")
+                    f"{players[i]}가 대기중입니다. 어떻게 하시겠습니까?\n [ 1) 일반공격 2) 스킬:{players[i].skill}(소모: {players[i].skill_cost}) 3) 포션 사용 4) 도망친다 ] : ")
                 if input_check(1, 4, action) == False:
                     continue
                 else:
@@ -139,16 +142,16 @@ def battle(players, monsters, money, character_skills):
                         target = input()
                         if target.isdigit() == False:
                             print("정수를 입력해주세요.")
-                            # time.sleep(2)
+                            time.sleep(2)
                         elif bool(re.search(f"[1-{len(monsters)}]", target)) == False:
                             print("잘못 입력했습니다. 다시 시도하세요.")
-                            # time.sleep(2)
+                            time.sleep(2)
                         else:
                             target_monster = monsters[int(target) - 1]
                             check_ = players[i].normal_attack(target_monster)
                             if check_ == True:
                                 earned_exp += int(target_monster.level * 2 * random.randint(
-                                    1, 2) + target_monster.max_HP * 1.2 * random.randint(1, 2))
+                                    1, 2) + target_monster.max_HP * 1.3 * random.randint(1, 2))
                                 target_monster = '기절'
                                 cache = []
                                 for i in monsters:
@@ -158,10 +161,10 @@ def battle(players, monsters, money, character_skills):
                             if len(monsters) == 0:
                                 print("승리!")
                                 time.sleep(2)
-                                # earned_exp
-                                players[0].level_up(earned_exp)
-                                players[1].level_up(earned_exp)
-                                players[2].level_up(earned_exp)
+                                earned_exp
+                                first_check[0].level_up(earned_exp)
+                                first_check[1].level_up(earned_exp)
+                                first_check[2].level_up(earned_exp)
 
                                 # get the money
                                 earned_money = int(
@@ -180,57 +183,61 @@ def battle(players, monsters, money, character_skills):
 
                     elif action == '2':
                         if players[i].skill == "그루밍":
-                            print("어떤 대상을 힐링하시겠습니까?  ", end="")
-                            print(players[0].name, players[1].name,
-                                  players[2].name, end="")
-                            # 일단 중지요~
+                            while True:
+                                print("어떤 대상을 힐링하시겠습니까?  ", end="")
+                                print(*players, end=" ")
+                                target = input()
+                                if input_check(1, len(players), target) == False:
+                                    continue
+                                else:
+                                    players[i].healing_Skill(
+                                        players[int(target)-1])
+                                    break
                         else:
-                            print("어떤 대상을 스킬공격하시겠습니까?  ", end="")
-                            print(''.join([f"{x}) {y} " for x, y in enumerate(
-                                [x for x in monsters if x.HP != 0], start=1)]))
-                            target = input()
-                            if target.isdigit() == False:
-                                print("정수를 입력해주세요.")
-                                # time.sleep(2)
-                            elif bool(re.search(f"[1-{len(monsters)}]", target)) == False:
-                                print("잘못 입력했습니다. 다시 시도하세요.")
-                                # time.sleep(2)
-                            else:
-                                target_monster = monsters[int(target) - 1]
-                                skill_find = character_skills[players[i].skill]
-                                print(players[i].skill, skill_find)
-                                check_ = skill_find(target_monster)
-                                if check_ == True:
-                                    earned_exp += int(target_monster.level * 2 * random.randint(
-                                        1, 2) + target_monster.max_HP * 1.2 * random.randint(1, 2))
-                                    target_monster = '기절'
-                                    cache = []
-                                    for i in monsters:
-                                        if i.HP != 0:
-                                            cache.append(i)
-                                    monsters = cache
+                            while True:
+                                print("어떤 대상을 스킬공격하시겠습니까?  ", end="")
+                                print(''.join([f"{x}) {y} " for x, y in enumerate(
+                                    [x for x in monsters if x.HP != 0], start=1)]))
+                                target = input()
+                                if input_check(1, len(monsters), target) == False:
+                                    continue
+                                else:
+                                    target_monster = monsters[int(target) - 1]
+                                    skill_find = character_skills[players[i].skill]
+                                    check_ = skill_find(target_monster)
+                                    # time.sleep(1)
+                                    if check_ == True:
+                                        earned_exp += int(target_monster.level * 2 * random.randint(
+                                            1, 2) + target_monster.max_HP * 1.2 * random.randint(1, 2))
+                                        target_monster = '기절'
+                                        cache = []
+                                        for i in monsters:
+                                            if i.HP != 0:
+                                                cache.append(i)
+                                        monsters = cache
 
-                                if len(monsters) == 0:
-                                    print("승리!")
-                                    time.sleep(2)
-                                    # earned_exp
-                                    players[0].level_up(earned_exp)
-                                    players[1].level_up(earned_exp)
-                                    players[2].level_up(earned_exp)
+                                    if len(monsters) == 0:
+                                        print("승리!")
+                                        time.sleep(2)
+                                        # earned_exp
+                                        first_check[0].level_up(earned_exp)
+                                        first_check[1].level_up(earned_exp)
+                                        first_check[2].level_up(earned_exp)
 
-                                    # get the money
-                                    earned_money = int(
-                                        earned_exp * round(random.random(), 2))
-                                    money += earned_money
-                                    print(f"{earned_money}$를 획득했습니다.")
-                                    print("")
-                                    input("\t 마을로 돌아가려면 아무 키나 누르세요.")
-                                    print("")
-                                    screen_clear()
-                                    if boss_battle_check:
-                                        return 'town', money, True
+                                        # get the money
+                                        earned_money = int(
+                                            earned_exp * round(random.random(), 2))
+                                        money += earned_money
+                                        print(f"{earned_money}$를 획득했습니다.")
+                                        print("")
+                                        input("\t 마을로 돌아가려면 아무 키나 누르세요.")
+                                        print("")
+                                        screen_clear()
 
-                                    return 'town', money
+                                        if boss_battle_check:
+                                            return 'town', money, True
+                                        return 'town', money
+                                    break
 
                     elif action == '3':
                         total_potions = potion1.num + potion2.num + potion3.num + potion4.num
@@ -254,6 +261,7 @@ def battle(players, monsters, money, character_skills):
                                     if bool(potion1.num) == False:
                                         print('\n현재 소유하고 계신 참치캔이 없습니다.')
                                         print('소유하고 계신 소매품으로 선택해주세요!')
+                                        time.sleep(1)
                                         continue
                                     else:
                                         potion1.take_potion_hp(players[i])
@@ -263,6 +271,7 @@ def battle(players, monsters, money, character_skills):
                                     if bool(potion2.num) == False:
                                         print('현재 소유하고 계신 츄르가 없습니다.')
                                         print('소유하고 계신 소매품으로 선택해주세요!')
+                                        time.sleep(1)
                                         continue
                                     else:
                                         potion2.take_potion_mp(players[i])
@@ -272,6 +281,7 @@ def battle(players, monsters, money, character_skills):
                                     if bool(potion3.num) == False:
                                         print('현재 소유하고 계신 북어포가 없습니다.')
                                         print('소유하고 계신 소매품으로 선택해주세요!')
+                                        time.sleep(1)
                                         continue
                                     else:
                                         potion3.take_potion_hp(players[i])
@@ -281,12 +291,16 @@ def battle(players, monsters, money, character_skills):
                                     if bool(potion4.num) == False:
                                         print('현재 소유하고 계신 캣닢이 없습니다.')
                                         print('소유하고 계신 소매품으로 선택해주세요!')
+                                        time.sleep(1)
                                         continue
                                     else:
                                         potion4.take_potion_mp(players[i])
                                         break
                         else:
                             print('현재 소유하신 소모품이 없습니다!')
+                            time.sleep(1)
+                            print('저런. 턴이 넘어갔네요!')
+                            time.sleep(1)
 
                     elif action == '4':
                         if monsters[0] in bosses:

@@ -44,7 +44,7 @@ class Object():
 
     def status(self):
         print(f"{self.name} LV.{self.level} : EXP {self.exp}/{self.max_exp}\n   HP {self.HP}/{self.max_HP} | MP {self.MP}/{self.max_MP}")
-
+    
     # 클래스 호출 시 문자열 출력
 
     def __str__(self):
@@ -60,6 +60,7 @@ class Character(Object):
         self.exp = exp
         self.max_exp = max_exp
         self.eq = eq
+        self.faint = False
 
     # 특수공격_냥검사 / 마나값 임의 / 공격값은 공격력비례 임의의 랜덤(기본 ~ +50%)값 - 몬스터의 방어력비례(30퍼) / 임의값입니다
 
@@ -155,12 +156,11 @@ class Character(Object):
 
 #   캐릭터 전투시작 & 디폴트 스테이터스 창
     def status(self):
-        print(f"{self.name} LV. {self.level} || HP: ({self.HP} / {self.max_HP}) || MP: ({self.MP} / {self.max_MP})")
+        return f"{self.name} LV. {self.level} || HP: ({self.HP} / {self.max_HP}) || MP: ({self.MP} / {self.max_MP})"
 
 #   캐릭터 올 스테이터스 창
     def all_status(self):
-        time.sleep(1)
-        print(f"{self.name} LV. {self.level} || EXP: ({self.exp} / {self.max_exp}) || HP: ({self.HP} / {self.max_HP}) || MP: ({self.MP} / {self.max_MP})\n   ATK: {self.attack} || DEF: {self.defense} || SPD: {self.speed} || eq='' ")
+        return f"{self.name} LV. {self.level} || EXP: ({self.exp} / {self.max_exp}) || HP: ({self.HP} / {self.max_HP}) || MP: ({self.MP} / {self.max_MP})\n   ATK: {self.attack} || DEF: {self.defense} || SPD: {self.speed} || 장비 : {self.eq} "
 
 
 class Monster(Object):

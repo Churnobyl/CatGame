@@ -31,20 +31,20 @@ def prebattle(character_list, money, character_skills):
     if len(battle_character) == 0:
         print("싸울 수 있는 고양이가 없습니다. 마을로 돌아갑니다.")
         time.sleep(2)
-        return 'town'
+        return 'town', money
 
     # 일반 던전 몬스터 가중치
     sum_ = 0
     for i in character_list:
         sum_ += i.level
-    avg_lv = sum_ // 3 + random.randint(1, 5)
+    avg_lv = sum_ // 3 + random.randint(1, 3)
 
-    # Monster List - 스텟 조정 필요
+    # Monster List        HP / MP / ATK / DEF / SPD
     monster_list = [
-        Monster("쥐", avg_lv, 100, 40, 20, 20, 7),
-        Monster("까치", avg_lv, 100, 40, 20, 20, 7),
-        Monster("바퀴벌레", avg_lv, 100, 30, 30, 20, 7),
-        Monster("뱀", avg_lv, 100, 40, 20, 20, 7)
+        Monster("쥐", avg_lv, 70, 0, 13, 15, 10),
+        Monster("까치", avg_lv, 100, 0, 18, 18, 7),
+        Monster("바퀴벌레", avg_lv, 110, 0, 15, 30, 12),
+        Monster("뱀", avg_lv, 80, 0, 20, 20, 10)
     ]
 
     # 전투에 나올 몬스터
@@ -311,16 +311,19 @@ def battle(players, monsters, money, character_skills):
                 targeted_player = random.randint(0, len(players) - 1)
                 check_ = monsters[j].normal_attack(players[targeted_player])
                 if check_ == True:
-                    players[targeted_player] = '기절'
+                    players[targeted_player].faint = True
                     cache = []
                     for i in players:
-                        if i == 0:
+                        if i.faint == False:
                             cache.append(i)
                     players = cache
 
                 if len(players) == 0:
                     print("패배...")
                     time.sleep(2)
+                    if boss_battle_check:
+                        return 'lose', money, True
+
                     return 'lose', money
 
             status_battle = 'player turn'
@@ -337,7 +340,7 @@ def prebossbattle(character_list, money, character_skills, boss_clear):
     if len(battle_character) == 0:
         print("싸울 수 있는 고양이가 없습니다. 마을로 돌아갑니다.")
         time.sleep(2)
-        return 'town'
+        return 'town', money, boss_clear
 
     # 고양이 셋 중 하나라도 기절해 있으면 의사 물어보기
     if len(battle_character) != len(character_list):
@@ -347,7 +350,7 @@ def prebossbattle(character_list, money, character_skills, boss_clear):
             print("좋은 자신감이에요")
             time.sleep(2)
         else:
-            return 'town'
+            return 'town', money, boss_clear
 
     # 나올 보스
     if boss_clear == 0:

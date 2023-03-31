@@ -19,10 +19,10 @@ status = 'town'
 
 # Character List
 characters = {
-    "1": Character("냥검사", 1, 1500, 300, 150, 200, 130, "냥냥펀치",),
-    "2": Character("냥법사", 1, 1200, 500, 120, 130, 100, "하악질"),
-    "3": Character("냥궁수", 1, 1000, 400, 180, 100, 180, "털뱉기"),
-    "4": Character("냥힐러", 1, 1400, 500, 90, 160, 140, "그루밍")
+    "1": Character("냥검사", 1, 160, 40, 30, 25, 20, "냥냥펀치"),
+    "2": Character("냥법사", 1, 140, 50, 20, 30, 25, "하악질"),
+    "3": Character("냥궁수", 1, 120, 40, 25, 20, 30, "털뱉기"),
+    "4": Character("냥힐러", 1, 200, 60, 20, 25, 20, "그루밍")
 }
 
 # Character Skill
@@ -114,4 +114,4 @@ while status != 'quit':
     # 총 스테이터스 창
 
     elif status == 'all_status':
-        status = all_status(player_character_list)
+        status = all_status_s(player_character_list)

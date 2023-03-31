@@ -92,9 +92,6 @@ while status != 'quit':
             boss_clear += 1
             check_boss_clear = False
 
-        if boss_clear == 3:
-            status == 'victory'
-
     elif status == 'lose':
         status, player_money = lose(player_money)
 
@@ -102,3 +99,6 @@ while status != 'quit':
 
     elif status == 'all_status':
         status = all_status_s(player_character_list)
+
+    elif status == 'victory':
+        print("승리하셨습니다!!")

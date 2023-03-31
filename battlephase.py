@@ -115,6 +115,7 @@ def battle(players, monsters, money, character_skills):
     # 턴 시작
     while True:
         first_check = players
+        second_check = monsters
         if status_battle == 'player turn':
             screen_clear()
             for i in range(len(players)):
@@ -233,6 +234,8 @@ def battle(players, monsters, money, character_skills):
                                         input("\t 마을로 돌아가려면 아무 키나 누르세요.")
                                         print("")
                                         screen_clear()
+                                        if second_check == bosses[3]:
+                                            return 'victory', money, True
 
                                         if boss_battle_check:
                                             return 'town', money, True

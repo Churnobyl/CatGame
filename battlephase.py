@@ -234,7 +234,7 @@ def battle(players, monsters, money, character_skills):
                                         input("\t 마을로 돌아가려면 아무 키나 누르세요.")
                                         print("")
                                         screen_clear()
-                                        if second_check == bosses[3]:
+                                        if second_check[0] == '제리':
                                             return 'victory', money, True
 
                                         if boss_battle_check:

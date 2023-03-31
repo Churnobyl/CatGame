@@ -118,7 +118,7 @@ class Character(Object):
 
     # 특수공격_냥힐러 / 마나값, 힐링값 임의로 주었습니다 / 지금 print 문이.. self.name이 시전하면서 self.name이 회복하는거라.. 이게 자힐로 들어가는 방법밖에.. 어떡할가여.. :>?
 
-    def healing_Skill(self, friend, monster):
+    def healing_Skill(self, friend):
         self.MP = max(self.MP - 50, 0)
         if self.MP == 0:
             print("보유 중인 MP가 모자랍니다! 스킬을 사용할 수 없습니다!")
@@ -130,12 +130,12 @@ class Character(Object):
             heal -= (friend.HP+heal - friend.max_HP)
         healing = heal
         print(f"{self.name}의 {self.skill}! {self.name}의 HP를 {healing}만큼 회복했습니다.")
-        if monster.HP == 0:
-            print(f"{monster.name}(이)가 쓰러졌습니다.")
-            time.sleep(2)
-            return True
-        else:
-            return False
+        # if monster.HP == 0:
+        #     print(f"{monster.name}(이)가 쓰러졌습니다.")
+        #     time.sleep(2)
+        #     return True
+        # else:
+        #     return False
 
     def level_plus1(self):
         self.max_HP = sh_state_up(self.max_HP)
@@ -199,7 +199,8 @@ class Boss(Monster):
         first_damage = random.randint(self.HP, int(self.HP * 1.5))
         damage = first_damage - int(monster.defense * 0.3)
         monster.HP = max(monster.HP - damage, 0)
-        print(f"{self.name}의 {self.skill}! {monster.name}에게 {damage}의 데미지를 입혔습니다.")
+        print(
+            f"{self.name}의 {self.skill}! 고양이를 박스로 후리다니! {monster.name}에게 {damage}의 데미지를 입혔습니다.")
         if monster.HP == 0:
             print(f"{monster.name}(이)가 쓰러졌습니다.")
             time.sleep(2)
@@ -256,11 +257,12 @@ class Equipment_Item(Item):
         self.attack_effect = attack_effect
 
     def equip(self, player):
-        self.player = player
-        player.attack += self.attack_effect
-        print(f"{player.name}의 공격력이 {self.attack_effect}만큼 증가했습니다!")
-        print(player.attack)
-        print(self.name)
+        if bool(player.eq) == False:
+            player.attack += self.attack_effect
+            player.eq = self.name
+            print(f"{player.name}의 공격력이 {self.attack_effect}만큼 증가했습니다!")
+        else:
+            print(f"{player.name}가 이미 장비 착용중!")
 
 
 class Potion_Item(Item):
@@ -284,10 +286,11 @@ class Potion_Item(Item):
 
 
 class Pet(Item):
-    def __init__(self, name, explanation, defense, price):
+    def __init__(self, name, explanation, defense, price, state):
         super().__init__(name, explanation)
         self.defense = defense
         self.price = price
+        self.state = state
 
     def upgrade_defense(self, other):
         other.defense += self.defense
@@ -297,14 +300,14 @@ class Pet(Item):
 characters = {
     "1": Character("냥검사", 1, 1500, 300, 150, 200, 130, "냥냥펀치",),
     "2": Character("냥법사", 1, 1200, 500, 120, 130, 100, "하악질"),
-    "3": Character("냥궁수", 1, 1000, 400, 180, 100, 180, "꾹꾹이"),
+    "3": Character("냥궁수", 1, 1000, 400, 180, 100, 180, "털뱉기"),
     "4": Character("냥힐러", 1, 1400, 500, 90, 160, 140, "그루밍")
 }
 
 character_skills = {
     "냥냥펀치": characters["1"].dealing_Skill,
-    "하악질": characters["2"].shooting_Skill,
-    "꾹꾹이": characters["3"].debuff_Skill,
+    "하악질": characters["2"].debuff_Skill,
+    "털뱉기": characters["3"].shooting_Skill,
     "그루밍": characters["4"].healing_Skill
 }
 
@@ -314,12 +317,13 @@ character_skills = {
 # player = Character("냥힐러", 1, 140, 50, 9, 16, 14)
 
 bosses = [
-    Boss("슈뢰딩거", 1, 1500, 300, 150, 200, 130, "슈뢰딩거의상 자식"),
+    Boss("슈뢰딩거", 1, 1500, 300, 150, 200, 130, "상 자식"),
     Boss("잼민이", 1, 1200, 500, 120, 130, 100, "돌 던지기"),
     Boss("잼순이", 1, 1000, 400, 180, 100, 180, "꼬리 당기기"),
     Boss("제리", 1, 1400, 500, 90, 160, 140, "볼링쇼")
 ]
 
+# 여기에 보스 스킬명 따로 필요 없나요? - 세희
 bosses_skills = [
     bosses[0].box_shot,
     bosses[1].boss_attack,
@@ -363,9 +367,18 @@ potion4 = Potion_Item("캣닢", "MP를 50만큼 채워줍니다.", 0, 50, 0)
 
 total_potions = 0
 
-pet1 = Pet('털뭉치', '방어력을 5만큼 증가시켜줍니다.', 5, 10)
-pet2 = Pet('캔디볼', '방어력을 10만큼 증가시켜줍니다.', 10, 15)
-pet3 = Pet('도토리볼', '방어력을 15만큼 증가시켜줍니다.', 15, 20)
+pet1 = Pet('털뭉치', '방어력을 5만큼 증가시켜줍니다.', 5, 10, 0)
+pet2 = Pet('캔디볼', '방어력을 10만큼 증가시켜줍니다.', 10, 15, 0)
+pet3 = Pet('도토리볼', '방어력을 15만큼 증가시켜줍니다.', 15, 20, 0)
+
+pets = {
+    "1": Pet('털뭉치', '방어력을 5만큼 증가시켜줍니다.', 5, 10, 0),
+    "2": Pet('캔디볼', '방어력을 10만큼 증가시켜줍니다.', 10, 15, 0),
+    "3": Pet('도토리볼', '방어력을 15만큼 증가시켜줍니다.', 15, 20, 0)
+}
+
+
+pet_list = []
 
 
 # 일반배틀 준비
@@ -453,7 +466,7 @@ def battle(players, monsters):
                 print("")
                 for j in range(len(monsters)):
                     print(
-                        f"{monsters[j]} Lv. {monsters[j].level} HP: ({monsters[j].HP} / {monsters[j].max_HP}) MP: ({monsters[j].MP} / {monsters[j].max_MP})")
+                        f"{monsters[j]} Lv. {monsters[j].level} HP: ({monsters[j].HP} / {monsters[j].max_HP})")
 
                 print("")
                 action = input(
@@ -461,7 +474,6 @@ def battle(players, monsters):
                 if action.isdigit() == False:
                     print("정수를 입력해주세요.")
                     time.sleep(2)
-                #  -- 동작 안함 --
                 elif bool(re.search(f"[1-4]", action)) == False:
                     print("잘못 입력했습니다. 다시 시도하세요.")
                     time.sleep(2)
@@ -499,39 +511,49 @@ def battle(players, monsters):
                                 town()
 
                     elif action == '2':
-                        print("어떤 대상을 스킬공격하시겠습니까?  ", end="")
-                        print(''.join([f"{x}) {y} " for x, y in enumerate(
-                            [x for x in monsters if x.HP != 0], start=1)]))
-                        target = input()
-                        if target.isdigit() == False:
-                            print("정수를 입력해주세요.")
-                            # time.sleep(2)
-                        elif bool(re.search(f"[1-{len(monsters)}]", target)) == False:
-                            print("잘못 입력했습니다. 다시 시도하세요.")
-                            # time.sleep(2)
-                        else:
-                            target_monster = monsters[int(target) - 1]
-                            skill_find = character_skills[players[i].skill]
-                            print(players[i].skill, skill_find)
-                            check_ = skill_find(target_monster)
-                            if check_ == True:
-                                earned_exp += int(target_monster.level * 2 * random.randint(
-                                    1, 2) + target_monster.max_HP * 1.2 * random.randint(1, 2))
-                                target_monster = '기절'
-                                cache = []
-                                for i in monsters:
-                                    if i.HP != 0:
-                                        cache.append(i)
-                                monsters = cache
+                        if players[i].skill == "그루밍":
+                            print("어떤 대상을 힐링하시겠습니까?  ", end="")
+                            print(players[0].name, players[1].name,
+                                  players[2].name, end="")
+                            target = input()
 
-                            if len(monsters) == 0:
-                                print("승리!")
-                                time.sleep(2)
-                                drop_item(earned_exp)
-                                # players[0].level_up(earned_exp)
-                                # players[1].level_up(earned_exp)
-                                # players[2].level_up(earned_exp)
-                                # town()
+                            target_friend = players[int(target) - 1]
+                            players[i].healing_Skill(target_friend)
+
+                        else:
+                            print("어떤 대상을 스킬공격하시겠습니까?  ", end="")
+                            print(''.join([f"{x}) {y} " for x, y in enumerate(
+                                [x for x in monsters if x.HP != 0], start=1)]))
+                            target = input()
+                            if target.isdigit() == False:
+                                print("정수를 입력해주세요.")
+                                # time.sleep(2)
+                            elif bool(re.search(f"[1-{len(monsters)}]", target)) == False:
+                                print("잘못 입력했습니다. 다시 시도하세요.")
+                                # time.sleep(2)
+                            else:
+                                target_monster = monsters[int(target) - 1]
+                                skill_find = character_skills[players[i].skill]
+                                print(players[i].skill, skill_find)
+                                check_ = skill_find(target_monster)
+                                if check_ == True:
+                                    earned_exp += int(target_monster.level * 2 * random.randint(
+                                        1, 2) + target_monster.max_HP * 1.2 * random.randint(1, 2))
+                                    target_monster = '기절'
+                                    cache = []
+                                    for i in monsters:
+                                        if i.HP != 0:
+                                            cache.append(i)
+                                    monsters = cache
+
+                                if len(monsters) == 0:
+                                    print("승리!")
+                                    time.sleep(2)
+                                    drop_item(earned_exp)
+                                    # players[0].level_up(earned_exp)
+                                    # players[1].level_up(earned_exp)
+                                    # players[2].level_up(earned_exp)
+                                    # town()
 
                     elif action == '3':
                         total_potions = potion1.num + potion2.num + potion3.num + potion4.num
@@ -717,7 +739,12 @@ def town():
         for i in range(len(player_character_list)):
             print(
                 f"{player_character_list[i]} Lv. {player_character_list[i].level} HP: ({player_character_list[i].HP} / {player_character_list[i].max_HP}) MP: ({player_character_list[i].MP} / {player_character_list[i].max_MP})")
-        print(f"소지금: {player_money[0]}$")
+
+        if bool(pet_list) == True:
+            print('현재 pet : ', end=" ")
+            print(*pet_list)
+        print(f"소지금: {player_money[0]}$\n")
+
         action = input("어디로 갈까요? [ 1)길거리 2)높은 탑 3)여관 4)상점 ] : ")
         if action.isdigit() == False:
             print("정수를 입력해주세요.")
@@ -774,12 +801,6 @@ def recovery_in_inn():
     town()
 
 # store - 양예린
-
-# 소모품/아이템 클래스에 가격을 인자로 넣어주는 것도 괜찮을거같아요..price
-# 소모품은 hp,mp 상승
-# 장비는 일단 공격력상승 이니까
-# 펫?같은거를 만들어서 돈을 더 얻는다거나 / 방어력 상승?
-
 
 # potion_items = {
 #     "참치캔": Potion_Item("참치캔", "HP를 20만큼 채워줍니다.", 20, 0,0),
@@ -839,6 +860,7 @@ def buy_item():
             elif choice == '2':
                 print('장비 구매를 원하시는군요!')
                 print('장비 구매의 가격은 $30 입니다.')
+
                 browse_equipment = {
                     "냥검사": equipment1.equip,
                     "냥법사": equipment2.equip,
@@ -850,8 +872,7 @@ def buy_item():
 
                 if choice_equipment == 'y':
                     for i in range(len(player_character_list)):
-                        if bool(player_character_list[i].eq) == False:
-                            print(f'{player_character_list[i]}', end=' ')
+                        print(f'{player_character_list[i]}', end=' ')
                     print(' 의 장비를 구매하실 수 있습니다.')
 
                     select = input("1,2,3:")
@@ -864,51 +885,78 @@ def buy_item():
                     elif select == '3':
                         browse_equipment[player_character_list[2].name](
                             player_character_list[2])
-
+                    print("체크!!!!", player_character_list[0].attack,
+                          player_character_list[0].eq)
                 elif choice_equipment == 'n':
                     continue
                 else:
                     print('y/n로 선택해주세요!')
                     break
 
+            # 펫은 펫 당 하나
             elif choice == '3':
-                print("\n귀여운 pet 구매를 원하시는군요! 탁월한 선택이십니다.^^")
-                print('==================소개판==================')
+                print("\n귀여운 pet 구매를 원하시는군요! 탁월한 선택이십니다.^^\n")
+                print(
+                    f'현재 pet) 털뭉치: {pet1.state} |캔디볼: {pet2.state} |도토리볼: {pet2.state}')
+                print('※안내※ pet은 종류당 한 마리만 구매하실 수 있습니다.\n')
+
+                print('====================소개판====================')
                 print(' 털뭉치 : 방어력을 5만큼 증가시켜줍니다.| $10')
                 print(' 캔디볼 : 방어력을 10만큼 증가시켜줍니다| $15')
                 print('도토리볼: 방어력을 15만큼 증가시켜줍니다| $20')
 
                 while True:
-                    choice_pet = input('1) 털뭉치 | 2) pet2 | 3) pet3 \n:')
+                    choice_pet = input('1) 털뭉치 | 2) 캔디볼 | 3) 도토리볼 \n:')
                     if choice_pet == '1':
-                        print('털뭉치를 구입하셨습니다!')
-                        pet1.upgrade_defense(player_character_list[0])
-                        pet1.upgrade_defense(player_character_list[1])
-                        pet1.upgrade_defense(player_character_list[2])
-                        print(f'털뭉치가 모두의 방어력을 5만큼 증가시켰습니다!')
+                        if pet1.state == 0:
+                            print('털뭉치를 구입하셨습니다!')
+                            pet1.upgrade_defense(player_character_list[0])
+                            pet1.upgrade_defense(player_character_list[1])
+                            pet1.upgrade_defense(player_character_list[2])
+                            print(f'털뭉치가 모두의 방어력을 5만큼 증가시켰습니다!')
+                            pet1.state += 1
+                            pet_list.append(pets[choice_pet].name)
+                            player_money[0] -= pet1.price
+                            break
 
-                        player_money[0] -= pet1.price
-                        break
+                        else:
+                            print(f'이미 {pet1.name}을 소유하고 계십니다!')
+                            print('※주의※ pet은 종류당 한 마리만 구매하실 수 있습니다!!')
+                            print('다른 종류의 pet으로 다시 선택해주세요!\n')
 
                     elif choice_pet == '2':
-                        print('캔디볼을 구입하셨습니다!')
-                        pet2.upgrade_defense(player_character_list[0])
-                        pet2.upgrade_defense(player_character_list[1])
-                        pet2.upgrade_defense(player_character_list[2])
-                        print(f'캔디볼이 모두의 방어력을 10만큼 증가시켰습니다!')
+                        if pet2.state == 0:
+                            print('캔디볼을 구입하셨습니다!')
+                            pet2.upgrade_defense(player_character_list[0])
+                            pet2.upgrade_defense(player_character_list[1])
+                            pet2.upgrade_defense(player_character_list[2])
+                            print(f'캔디볼이 모두의 방어력을 10만큼 증가시켰습니다!')
+                            pet2.state += 1
+                            pet_list.append(pets[choice_pet].name)
+                            player_money[0] -= pet2.price
+                            break
 
-                        player_money[0] -= pet2.price
-                        break
+                        else:
+                            print(f'이미 {pet2.name}을 소유하고 계십니다!')
+                            print('※주의※ pet은 종류당 한 마리만 구매하실 수 있습니다!!')
+                            print('다른 종류의 pet으로 다시 선택해주세요!\n')
 
                     elif choice_pet == '3':
-                        print('도토리볼을 구입하셨습니다!')
-                        pet3.upgrade_defense(player_character_list[0])
-                        pet3.upgrade_defense(player_character_list[1])
-                        pet3.upgrade_defense(player_character_list[2])
-                        print(f'도토리볼이 모두의 방어력을 15만큼 증가시켰습니다!')
+                        if pet3.state == 0:
+                            print('도토리볼을 구입하셨습니다!')
+                            pet3.upgrade_defense(player_character_list[0])
+                            pet3.upgrade_defense(player_character_list[1])
+                            pet3.upgrade_defense(player_character_list[2])
+                            print(f'도토리볼이 모두의 방어력을 15만큼 증가시켰습니다!')
+                            pet3.state += 1
+                            pet_list.append(pets[choice_pet].name)
+                            player_money[0] -= pet3.price
+                            break
 
-                        player_money[0] -= pet3.price
-                        break
+                        else:
+                            print(f'이미 {pet3.name}을 소유하고 계십니다!')
+                            print('※주의※ pet은 종류당 한 마리만 구매하실 수 있습니다!!')
+                            print('다른 종류의 pet으로 다시 선택해주세요!\n')
 
                     else:
                         print('\n1, 2, 3 중에 선택해주십시오.')
@@ -918,7 +966,7 @@ def buy_item():
                 print('\n1, 2, 3 중에 선택해주세요!!')
                 continue
 
-            print(f'남은 소지금은{player_money[0]}원 입니다!')
+            print(f'\n남은 소지금은{player_money[0]}원 입니다!')
 
             if player_money[0] == 0:
                 print('가지고 계신 소지금을 모두 사용하셨습니다!\n다음에 또 만나요~')
@@ -993,14 +1041,14 @@ time.sleep(1)
 # 캐릭터 선택(3 마리)
 while len(player_character_list) < 4:
     os.system(clear)
-    print("간택 받고 싶은 고양이 세마리를 골라주세요!(현재:", end=" ")
+    print("간택 받고 싶은 고양이 세 마리를 한 마리씩 골라주세요!(현재:", end=" ")
     print(*player_character_list, end=" ")
     print(")")
     select = input("1)냥검사 2)냥법사 3)냥궁수 4)냥힐러 : ")
     if select.isdigit() == False:
         print("정수를 입력해주세요.")
         time.sleep(1)
-    elif bool(re.search("[1-4]", select)) == False:
+    elif bool(re.search("[1-4]{1}", select)) == False:
         print("잘못 입력했습니다. 다시 시도하세요.")
         time.sleep(1)
     elif characters[select] in player_character_list:

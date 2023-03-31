@@ -15,6 +15,14 @@ def input_check(x, y, text):
         return True
 
 
+def input_check2(text):
+    if bool(re.fullmatch("[xy]", text)) is False:
+        print("잘못 입력했습니다. 다시 시도하세요.")
+        return False
+    else:
+        return True
+
+
 def screen_clear():
     os_check = platform.system()
     if os_check == 'Windows':
